@@ -174,9 +174,15 @@
                     💬 Lanjut Konfirmasi ke WhatsApp
                 </a>
             @elseif($order->status === 'pending')
-                <a href="https://wa.me/{{ $waNumber }}?text={{ urlencode('Halo Admin, saya ingin mengkonfirmasi pembayaran untuk Order ' . $order->order_code . '. Berikut bukti pembayarannya:') }}" target="_blank" class="btn btn-wa">
-                    💬 Konfirmasi via WhatsApp
-                </a>
+                @if(!empty($waNumber))
+                    <a href="https://wa.me/{{ $waNumber }}?text={{ urlencode('Halo Admin, saya ingin mengkonfirmasi pembayaran untuk Order ' . $order->order_code . '. Berikut bukti pembayarannya:') }}" target="_blank" class="btn btn-wa">
+                        💬 Konfirmasi via WhatsApp
+                    </a>
+                @else
+                    <button class="btn btn-wa" style="opacity:0.6; cursor:not-allowed;" disabled>
+                        💬 No WhatsApp Belum Disetting Admin
+                    </button>
+                @endif
             @endif
 
             <a href="javascript:window.print()" class="btn btn-home" style="margin-top:-4px;">

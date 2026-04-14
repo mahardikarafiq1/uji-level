@@ -217,12 +217,28 @@
         .mgmt-card h3 { font-family: 'Playfair Display', serif; color: var(--coffee); font-size: 20px; margin-bottom: 8px; }
         .mgmt-card p { font-size: 14px; color: var(--text-muted); }
 
+        /* ===== FOOTER ===== */
+        .footer { background: var(--coffee-darkest); color: rgba(255,255,255,0.6); padding: 72px 0 0; }
+        .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 48px; margin-bottom: 48px; }
+        .footer-brand { font-family: 'Great Vibes', cursive; font-size: 36px; color: var(--gold); margin-bottom: 16px; }
+        .footer-desc { font-size: 14px; line-height: 1.8; margin-bottom: 20px; }
+        .footer-socials { display: flex; gap: 12px; }
+        .footer-socials a { width: 40px; height: 40px; border-radius: 10px; background: rgba(255,255,255,0.06); display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,0.5); text-decoration: none; transition: all 0.3s; font-size: 16px; }
+        .footer-socials a:hover { background: var(--gold); color: var(--coffee-darkest); }
+        .footer h4 { color: var(--white); font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 600; margin-bottom: 20px; }
+        .footer ul { list-style: none; }
+        .footer ul li { margin-bottom: 12px; }
+        .footer ul a { color: rgba(255,255,255,0.5); text-decoration: none; font-size: 14px; transition: color 0.3s; }
+        .footer ul a:hover { color: var(--gold); }
+        .footer-bottom { border-top: 1px solid rgba(255,255,255,0.08); padding: 24px 0; text-align: center; font-size: 13px; }
+
         /* ===== RESPONSIVE ===== */
         @media (max-width: 1024px) {
             .about-grid { grid-template-columns: 1fr; gap: 40px; }
             .about-image img { height: 360px; }
             .menu-grid { grid-template-columns: repeat(2, 1fr); }
             .features-grid { grid-template-columns: repeat(2, 1fr); }
+            .footer-grid { grid-template-columns: 1fr 1fr; gap: 36px; }
         }
         @media (max-width: 768px) {
             .section-pad { padding: 64px 0; }
@@ -236,6 +252,8 @@
             .features-grid { grid-template-columns: 1fr; max-width: 360px; margin: 0 auto; }
             .about-stats { grid-template-columns: 1fr; text-align: center; gap: 24px; }
             .mgmt-cards { flex-direction: column; }
+            .footer-grid { grid-template-columns: 1fr; text-align: center; }
+            .footer-socials { justify-content: center; }
         }
     </style>
 </head>
@@ -332,15 +350,19 @@
 
                 @forelse($highlightProducts as $delay => $product)
                 <div class="menu-card reveal stagger-{{ min($delay + 1, 6) }}">
-                    <div class="menu-card-img-wrap">
-                        @if($product->image_url)
-                            <img src="{{ $product->image_url }}" alt="{{ $product->name }}" class="menu-card-img">
-                        @else
-                            <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:48px;">☕</div>
-                        @endif
-                    </div>
+                    <a href="{{ url('/menu/' . $product->id) }}" style="text-decoration:none; color:inherit; display:block;">
+                        <div class="menu-card-img-wrap">
+                            @if($product->image_url)
+                                <img src="{{ $product->image_url }}" alt="{{ $product->name }}" class="menu-card-img">
+                            @else
+                                <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:48px;">☕</div>
+                            @endif
+                        </div>
+                    </a>
                     <div class="menu-card-body">
-                        <h3>{{ $product->name }}</h3>
+                        <a href="{{ url('/menu/' . $product->id) }}" style="text-decoration:none; color:inherit;">
+                            <h3>{{ $product->name }}</h3>
+                        </a>
                         <p>{{ Str::limit($product->description, 60) }}</p>
                         <div class="menu-card-price">Rp {{ number_format($product->price, 0, ',', '.') }}</div>
                     </div>

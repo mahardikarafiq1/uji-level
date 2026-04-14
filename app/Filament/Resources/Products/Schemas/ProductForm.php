@@ -46,6 +46,7 @@ class ProductForm
                     ->label('Foto Produk')
                     ->image()
                     ->imageEditor()
+                    ->disk('public')
                     ->directory('products')
                     ->imagePreviewHeight('250')
                     ->columnSpanFull(),

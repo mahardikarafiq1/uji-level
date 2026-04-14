@@ -10,16 +10,13 @@ use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
-use Filament\Schemas\Schema;
-use Filament\Support\Icons\Heroicon;
-use BackedEnum;
-use UnitEnum;
+use Filament\Forms\Form;
 
 class CafeSettings extends Page implements HasForms
 {
     use InteractsWithForms;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCog6Tooth;
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-cog-6-tooth';
 
     protected string $view = 'filament.pages.cafe-settings';
 
@@ -27,7 +24,7 @@ class CafeSettings extends Page implements HasForms
 
     protected static ?string $title = 'Pengaturan Cafe';
 
-    protected static UnitEnum|string|null $navigationGroup = 'Settings';
+    protected static string|\UnitEnum|null $navigationGroup = 'Settings';
 
     protected static ?int $navigationSort = 99;
 
@@ -40,10 +37,10 @@ class CafeSettings extends Page implements HasForms
         $this->qris_image = Setting::getValue('qris_image', '');
     }
 
-    public function form(Schema $schema): Schema
+    public function form(Form $form): Form
     {
-        return $schema
-            ->components([
+        return $form
+            ->schema([
                 Section::make('WhatsApp')
                     ->description('Nomor WhatsApp untuk menerima pesanan dari customer.')
                     ->schema([
@@ -52,7 +49,7 @@ class CafeSettings extends Page implements HasForms
                             ->placeholder('6281234567890')
                             ->helperText('Format internasional tanpa +, contoh: 6281234567890')
                             ->tel()
-                            ->required(),
+                            ->nullable(),
                     ]),
 
                 Section::make('QRIS')
@@ -61,16 +58,18 @@ class CafeSettings extends Page implements HasForms
                         FileUpload::make('qris_image')
                             ->label('Gambar QRIS')
                             ->image()
+                            ->disk('public')
                             ->directory('settings')
-                            ->helperText('Upload gambar QR Code QRIS Anda'),
+                            ->helperText('Upload gambar QR Code QRIS Anda (jika kosong, qris disembunyikan)')
+                            ->nullable(),
                     ]),
             ]);
     }
 
     public function save(): void
     {
-        Setting::setValue('whatsapp_number', $this->whatsapp_number);
-        Setting::setValue('qris_image', $this->qris_image);
+        Setting::setValue('whatsapp_number', $this->whatsapp_number ?? '');
+        Setting::setValue('qris_image', $this->qris_image ?? '');
 
         Notification::make()
             ->title('Pengaturan berhasil disimpan!')

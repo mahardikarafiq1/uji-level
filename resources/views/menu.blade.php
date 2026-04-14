@@ -176,16 +176,20 @@
             <div class="product-grid">
                 @foreach($products as $product)
                     <div class="product-card" id="product-{{ $product->id }}">
-                        <div class="product-img-wrap">
-                            @if($product->image_url)
-                                <img class="product-img" src="{{ $product->image_url }}" alt="{{ $product->name }}" loading="lazy">
-                            @else
-                                <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:48px;color:var(--cream);">☕</div>
-                            @endif
-                        </div>
+                        <a href="{{ url('/menu/' . $product->id) }}" style="text-decoration:none; color:inherit; display:block;">
+                            <div class="product-img-wrap">
+                                @if($product->image_url)
+                                    <img class="product-img" src="{{ $product->image_url }}" alt="{{ $product->name }}" loading="lazy">
+                                @else
+                                    <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:48px;color:var(--cream);">☕</div>
+                                @endif
+                            </div>
+                        </a>
                         <div class="product-body">
                             <div class="product-cat">{{ $product->category }}</div>
-                            <h3>{{ $product->name }}</h3>
+                            <a href="{{ url('/menu/' . $product->id) }}" style="text-decoration:none; color:inherit;">
+                                <h3>{{ $product->name }}</h3>
+                            </a>
                             <p>{{ Str::limit($product->description, 80) }}</p>
                             <div class="product-footer">
                                 <div class="product-price">Rp {{ number_format($product->price, 0, ',', '.') }}</div>

@@ -14,6 +14,7 @@ Route::get('/', function () {
 
 // 2. Menu Page & API
 Route::get('/menu', [MenuController::class, 'index'])->name('menu');
+Route::get('/menu/{product}', [MenuController::class, 'show'])->name('menu.show');
 Route::get('/api/products', [MenuController::class, 'products'])->name('api.products');
 
 // 3. Cart & Checkout
@@ -24,7 +25,7 @@ Route::get('/order/{orderCode}', [CartController::class, 'confirmation'])->name(
 // ======== CAFE MANAGEMENT (FILAMENT) ========
 
 // Dashboard redirect to Filament
-Route::get('/dashboard', function () {
+Route::get('/dashboard', function () { 
     return redirect('/admin');
 })->middleware(['auth', 'verified'])->name('dashboard');
 

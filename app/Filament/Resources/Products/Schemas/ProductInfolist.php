@@ -13,7 +13,7 @@ class ProductInfolist
     {
         return $schema
             ->components([
-                ImageEntry::make('image_path')
+                ImageEntry::make('image_url')
                     ->label('Foto Produk')
                     ->height(250)
                     ->placeholder('-'),

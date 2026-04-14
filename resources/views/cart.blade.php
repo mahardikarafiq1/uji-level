@@ -155,6 +155,12 @@
     </section>
 
     <div class="container">
+        @if(session('error'))
+            <div style="background: rgba(180, 40, 40, 0.1); border-left: 4px solid #b42828; color: #b42828; padding: 16px; border-radius: 8px; margin-bottom: 24px; font-weight: 500;">
+                ⚠ {{ session('error') }}
+            </div>
+        @endif
+
         <!-- EMPTY STATE -->
         <div class="empty-cart" id="emptyCart" style="display:none;">
             <div class="icon">🛒</div>

@@ -82,7 +82,11 @@ class CartController extends Controller
 
         // If WhatsApp, build WA redirect URL
         if ($validated['payment_method'] === 'whatsapp') {
-            $waNumber = Setting::getValue('whatsapp_number', '6281234567890');
+            $waNumber = Setting::getValue('whatsapp_number', '');
+            if (empty($waNumber)) {
+                return back()->with('error', 'Fitur Checkout WhatsApp saat ini dinonaktifkan karena admin belum mendaftarkan nomor tujuan.');
+            }
+
             $waMessage = $this->buildWhatsAppMessage($order);
             $waUrl = 'https://wa.me/' . $waNumber . '?text=' . urlencode($waMessage);
 
@@ -99,8 +103,8 @@ class CartController extends Controller
             ->with('items.product')
             ->firstOrFail();
 
-        $qrisImage = Setting::getValue('qris_image');
-        $waNumber = Setting::getValue('whatsapp_number', '6281234567890');
+        $qrisImage = Setting::getValue('qris_image', '');
+        $waNumber = Setting::getValue('whatsapp_number', '');
 
         return view('order-confirmation', compact('order', 'qrisImage', 'waNumber'));
     }

@@ -31,7 +31,7 @@ class Product extends Model
      */
     public function getImageUrlAttribute(): ?string
     {
-        if (! $this->image_path) {
+        if (empty($this->image_path)) {
             return null;
         }
 

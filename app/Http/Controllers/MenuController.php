@@ -31,6 +31,14 @@ class MenuController extends Controller
     }
 
     /**
+     * Show detailed product page for public user.
+     */
+    public function show(Product $product)
+    {
+        return view('product-detail', compact('product'));
+    }
+
+    /**
      * API endpoint for AJAX product loading.
      */
     public function products(Request $request)
