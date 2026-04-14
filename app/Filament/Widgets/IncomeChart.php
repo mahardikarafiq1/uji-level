@@ -8,7 +8,7 @@ use Carbon\Carbon;
 
 class IncomeChart extends ChartWidget
 {
-    protected static ?string $heading = 'Grafik Pendapatan 7 Hari Terakhir';
+    protected ?string $heading = 'Grafik Pendapatan 7 Hari Terakhir';
     
     protected static ?int $sort = 2;
     
