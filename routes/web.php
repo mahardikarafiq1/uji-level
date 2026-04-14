@@ -1,47 +1,34 @@
 <?php
 
+use App\Http\Controllers\CartController;
+use App\Http\Controllers\MenuController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
+// ======== PUBLIC WEB E-COMMERCE ========
+
+// 1. Landing Page
 Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/landing', function () {
-    return view('landing');
-});
+// 2. Menu Page & API
+Route::get('/menu', [MenuController::class, 'index'])->name('menu');
+Route::get('/api/products', [MenuController::class, 'products'])->name('api.products');
 
-Route::get('/cart', function () {
-    return view('cart');
-});
+// 3. Cart & Checkout
+Route::get('/cart', [CartController::class, 'index'])->name('cart');
+Route::post('/checkout', [CartController::class, 'checkout'])->name('checkout');
+Route::get('/order/{orderCode}', [CartController::class, 'confirmation'])->name('order.confirmation');
 
-Route::get('/seats', function () {
-    return view('seats');
-});
+// ======== CAFE MANAGEMENT (FILAMENT) ========
 
-Route::get('/manual', function () {
-    return view('manual');
-});
-
-Route::get('/account', function () {
-    return view('account');
-});
-
-Route::get('/login-preview', function () {
-    return view('login');
-});
-
-Route::get('/dashboard-preview', function (Illuminate\Http\Request $request) {
-    // We provide a fallback user object if they aren't logged in but previewing
-    return view('dashboard', [
-        'user' => $request->user() ?? (object)['name' => 'Demo User', 'email' => 'demo@example.com']
-    ]);
-});
-
-Route::get('/dashboard', function (Illuminate\Http\Request $request) {
-    return view('dashboard', ['user' => $request->user()]);
+// Dashboard redirect to Filament
+Route::get('/dashboard', function () {
+    return redirect('/admin');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
+// Auth routes (via Breeze, optional since Filament provides its own auth)
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

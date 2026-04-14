@@ -1,59 +1,79 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# ☕ Felize Cafe – Modern E-Commerce POS & Booking System
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Sebuah sistem *Cafe Management* dan *E-Commerce* terpadu yang dibangun menggunakan ekosistem **Laravel 11** dan **Filament v3**. Website ini didesain tidak hanya sebagai perantara untuk melihat menu profil cafe saja, tetapi dioptimalkan secara langsung untuk operasional kafe seperti penerimaan pemesanan meja *Dine-in*, *Takeaway*, Manajemen Order, dan sistem struk mandiri mandiri (*Self-serve Checkout*).
 
-## About Laravel
+## ✨ Fitur Utama
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- **Landing Page Interaktif**: Menampilkan *Coffee Hero Parallax* khusus, seksi sejarah cafe, deskripsi service/fitur kafe, dan kurasi beberapa rekomendasi menu secara otomatis dari database.
+- **Menu Guest Checkout**: 
+   - Pelanggan (*Customer*) tidak diwajibkan untuk mendaftar akun atau login.
+   - Keranjang/Cart secara asinkronus disimpan pada `localStorage` browser pengguna.
+- **Sistem Pembayaran Dinamis**:
+   - **Order via WhatsApp**: Semua data tagihan, nomor kode pemesanan keranjang, item belanja dirangkum menjadi pesan yang berformat lalu otomatis meneruskan pemesan untuk menge-chat nomor admin WhatsApp (bisa diatur mandiri dari _Pengaturan Dasbor_).
+   - **Virtual Struk (QRIS)**: Order dicatat sementara dengan status _Tertunda (Pending)_, pelanggan diarahkan ke halaman virtual struk dengan gambar scanner barcode **QRIS**. Gambar _QRIS_ juga dapat diganti lewat kontrol dasbor kasir admin.
+- **Admin Dashboard (Filament v3)**:
+   - Panel canggih, minim lag bergaya mode layar terang warna *Kopi (Coffee Theme)*.
+   - **Tabel Produk/Menu:** Tambah foto produk, atur ketersedian limit (_Stock Availability_), Harga dan Kategori, CRUD produk.
+   - **Manajemen Pesanan:** Verifikasi status pemesanan (1 Kali Klik *Confirm Payment* action toggle dari list menu Order).
+   - **Menu Pengaturan Instan:** Update pengaturan nomo HP WhatsApp kafe dan upload/update Gambar QRIS Toko.
+- **Statistik & Analisis (Dahsboard Widgets)**:
+   - Pantauan Grafik 7 Hari Laporan Income Kafe (Uang Masuk).
+   - Indikator perhitungan metrik otomatis (Tingkat Pemasukkan Sukses, Tingkat Order Batal, Kalkulasi ~30% Profit Keuntungan).
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## 🛠 Instalasi dan Konfigurasi Lokal
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Dikarenakan proyek ini berjalan diatas ekosistem *Laravel*, pastikan lingkungan kerja komputermu sudah terinstall `PHP >= 8.2`, `Composer`, dan `Node.js` (opsional untuk asset bundling). Aplikasi ini secara bawaan menggunakan database **SQLite**, jadi kamu tidak perlu ribet mengkonfigurasikan MySQL/MariaDB!
 
-## Learning Laravel
+1. Clone repositori ini atau ekstraksi berkas folder `uji-level`.
+2. Buka terminal atau Command Prompt pada direktori project:
+    ```bash
+    cd uji-level
+    ```
+3. Lakukan instalasi semua *Dependency* Laravel:
+    ```bash
+    composer install
+    ```
+4. Mengcopy konfigurasi *environment* file (Jika belum ada):
+    ```bash
+    cp .env.example .env
+    ```
+5. Buat sebuah database SQLite yang kosong dengan men-generate file:
+    ```bash
+    touch database/database.sqlite
+    ```
+6. Generate _App Key_ dari Laravel:
+    ```bash
+    php artisan key:generate
+    ```
+7. Symlink Folder *Public Storage* (Wajib agar dapat mengunggah gambar produk dan gambar QRIS lalu menpilkannya):
+    ```bash
+    php artisan storage:link
+    ```
+8. Eksekusi semua file *Migrations* ke dalam tabel Database SQLite, sekaligus mengeksekusi Seeder (Bawaan _dummy_ user login admin, dan dummy products):
+    ```bash
+    php artisan migrate --seed
+    ```
+9. Jalankan web server Laravel!
+    ```bash
+    php artisan serve
+    ```
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+## 🔒 Akses Kredensial Administrator
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Setelah melakukan tahap *migration seeder* diatas, secara asali (*default*), sistem telah mempersiapkan **satu akun sakti Administrator** untuk mengendalikan selipan Filamnet Dashboard Panel. Silakan akses URL dibawah pada peramban web (*browser*):
 
-## Laravel Sponsors
+**URL Login Panel**: `http://localhost:8000/admin`
+**Alamat Email**: `admin@felizecafe.com`
+**Kata Sandi (Password)**: `password`
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+## 🗃 Struktur Basis Data (Entity Relationship)
 
-### Premium Partners
+Aplikasi memiliki konsep model utama yang saling ber-relasi yakni:
+- `Products` (Kopi, Roti, Hidangan)
+- `Seats` (Nomor/Tanda letak bangku pada Kafe)
+- `Orders` (Rincian Catatan Belanja, kode unik `FLZ-XXXX`, Metode Bayar)
+- `Order_Items` (Koneksi list/daftar produk _Many-to-Many_ kearah pesanan *Orders*)
+- `Settings` (Variabel penentu nilai dinamis _WA & Qris_)
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
-
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+---
+*Dibuat oleh Tim Pengembang @ 2026 Felize Cafe Enterprise*

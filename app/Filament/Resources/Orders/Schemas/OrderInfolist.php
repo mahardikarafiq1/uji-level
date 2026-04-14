@@ -11,20 +11,40 @@ class OrderInfolist
     {
         return $schema
             ->components([
-                TextEntry::make('user_id')
-                    ->numeric()
-                    ->placeholder('-'),
+                TextEntry::make('order_code')
+                    ->label('Kode Order')
+                    ->weight('bold')
+                    ->placeholder('—'),
                 TextEntry::make('customer_name')
-                    ->placeholder('-'),
+                    ->label('Nama Customer'),
+                TextEntry::make('customer_phone')
+                    ->label('No. WhatsApp')
+                    ->placeholder('—'),
+                TextEntry::make('seat_code')
+                    ->label('Meja')
+                    ->badge()
+                    ->placeholder('—'),
                 TextEntry::make('total_amount')
-                    ->numeric(),
-                TextEntry::make('status'),
+                    ->label('Total')
+                    ->money('IDR', locale: 'id'),
+                TextEntry::make('status')
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'completed'  => 'success',
+                        'processing' => 'info',
+                        'cancelled'  => 'danger',
+                        default      => 'warning',
+                    }),
+                TextEntry::make('payment_method')
+                    ->label('Metode Bayar')
+                    ->placeholder('—'),
+                TextEntry::make('notes')
+                    ->label('Catatan')
+                    ->placeholder('—')
+                    ->columnSpanFull(),
                 TextEntry::make('created_at')
-                    ->dateTime()
-                    ->placeholder('-'),
-                TextEntry::make('updated_at')
-                    ->dateTime()
-                    ->placeholder('-'),
+                    ->label('Tanggal')
+                    ->dateTime(),
             ]);
     }
 }

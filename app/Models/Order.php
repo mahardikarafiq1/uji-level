@@ -9,10 +9,15 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Order extends Model
 {
     protected $fillable = [
+        'order_code',
         'user_id',
         'customer_name',
+        'customer_phone',
         'total_amount',
         'status',
+        'payment_method',
+        'seat_code',
+        'notes',
     ];
 
     protected $casts = [
@@ -27,5 +32,25 @@ class Order extends Model
     public function items(): HasMany
     {
         return $this->hasMany(OrderItem::class);
+    }
+
+    /**
+     * Generate a unique order code.
+     */
+    public static function generateOrderCode(): string
+    {
+        do {
+            $code = 'FLZ-' . strtoupper(substr(uniqid(), -6));
+        } while (static::where('order_code', $code)->exists());
+
+        return $code;
+    }
+
+    /**
+     * Get formatted total.
+     */
+    public function getFormattedTotalAttribute(): string
+    {
+        return 'Rp ' . number_format($this->total_amount, 0, ',', '.');
     }
 }

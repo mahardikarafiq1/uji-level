@@ -1,129 +1,322 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Manual</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Keranjang — Felize Cafe</title>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;800&family=Inter:wght@300;400;500;600;700&family=Great+Vibes&display=swap" rel="stylesheet">
     <style>
-        body { background:#fff; font-family: Arial, sans-serif; margin:0; }
-        .sidebar { position:fixed; top:0; left:0; width:230px; height:100%; background:#e5d6c3; padding:20px 10px; border-right:1px solid #cbb79e; transition:0.3s; z-index:1000; }
-        .sidebar.collapsed { width:70px; }
-        .sidebar .menu-text { margin-left:10px; }
-        .sidebar.collapsed .menu-text { display:none; }
-        .profile { text-align:center; margin-bottom:25px; }
-        .profile i { font-size:40px; color:#4b2a12; }
-        .sidebar a { display:flex; align-items:center; padding:10px; color:#000; text-decoration:none; border-radius:8px; margin-bottom:8px; }
-        .sidebar a:hover { background:#d8c8b5; }
-        .toggle-btn { position:absolute; top:10px; right:-15px; background:#4b2a12; color:#fff; border-radius:50%; padding:5px 8px; cursor:pointer; }
-        .content { margin-left:230px; transition:0.3s; }
-        .content.full { margin-left:70px; }
-        .top-header { background:#4b2a12; color:#fff; padding:12px; text-align:center; font-weight:bold; letter-spacing:1px; }
-        .topic-select { display:flex; justify-content:center; margin-top:16px; }
-        .select-btn { background:#4b2a12; color:#fff; border:none; border-radius:12px; padding:10px 18px; font-weight:800; }
-        .manual-box { max-width:960px; margin:20px auto; background:#efe4d7; border:4px solid #000; border-radius:22px; padding:18px; height:480px; overflow-y:auto; }
-        .manual-title { font-weight:800; font-size:24px; }
-        .manual-sub { color:#555; font-weight:700; margin-top:2px; }
-        .manual-section h5 { font-weight:800; margin-top:14px; }
-        .manual-section p { margin-bottom:8px; }
-        .btn-coffee { background:#4b2a12; color:#fff; border:none; border-radius:12px; padding:10px 16px; font-weight:800; display:inline-flex; align-items:center; gap:8px; }
+        *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+        :root{--coffee-darkest:#1a0d04;--coffee-dark:#2b1608;--coffee:#4b2a12;--coffee-medium:#6b3b1a;
+            --cream:#d8c8b5;--cream-light:#e5d6c3;--cream-lightest:#f0ebe3;--paper:#faf8f5;
+            --gold:#c9a96e;--gold-light:#e8d5a8;--text-dark:#2b1608;--text-muted:#7a5e44;--white:#fff;}
+        html{scroll-behavior:smooth}
+        body{font-family:'Inter',sans-serif;color:var(--text-dark);background:var(--paper);min-height:100vh;}
+        .container{max-width:1200px;margin:0 auto;padding:0 24px;}
+
+        /* NAVBAR */
+        .navbar{position:fixed;top:0;left:0;right:0;z-index:1000;padding:16px 0;
+            background:rgba(250,248,245,0.92);backdrop-filter:blur(20px);box-shadow:0 1px 24px rgba(75,42,18,0.08);}
+        .navbar .container{display:flex;justify-content:space-between;align-items:center;}
+        .nav-brand{font-family:'Great Vibes',cursive;font-size:32px;color:var(--coffee);text-decoration:none;}
+        .nav-links{display:flex;gap:28px;list-style:none;align-items:center;}
+        .nav-links a{color:var(--coffee-medium);text-decoration:none;font-size:14px;font-weight:500;
+            letter-spacing:0.5px;text-transform:uppercase;transition:color 0.3s;}
+        .nav-links a:hover{color:var(--coffee);}
+        .nav-cta{background:var(--coffee)!important;color:var(--white)!important;padding:10px 24px;
+            border-radius:50px;font-weight:600!important;}
+        .nav-cta:hover{background:var(--coffee-medium)!important;}
+        .nav-toggle{display:none;background:none;border:none;cursor:pointer;padding:8px;}
+        .nav-toggle span{display:block;width:24px;height:2px;background:var(--coffee);margin:6px 0;border-radius:2px;}
+
+        /* PAGE */
+        .page-header{padding:120px 0 32px;text-align:center;}
+        .page-header h1{font-family:'Playfair Display',serif;font-size:clamp(32px,5vw,48px);
+            color:var(--coffee);font-weight:700;margin-bottom:8px;}
+        .page-header p{font-size:16px;color:var(--text-muted);}
+
+        /* CART LAYOUT */
+        .cart-layout{display:grid;grid-template-columns:1.4fr 1fr;gap:36px;padding-bottom:80px;}
+
+        /* CART ITEMS */
+        .cart-items-box{background:var(--white);border-radius:20px;padding:28px;
+            box-shadow:0 2px 8px rgba(75,42,18,0.08);border:1px solid rgba(229,214,195,0.4);}
+        .cart-item{display:flex;gap:16px;padding:16px 0;border-bottom:1px solid var(--cream-lightest);align-items:center;}
+        .cart-item:last-child{border-bottom:none;}
+        .cart-item-img{width:72px;height:72px;border-radius:12px;object-fit:cover;background:var(--cream-lightest);}
+        .cart-item-info{flex:1;}
+        .cart-item-info h4{font-family:'Playfair Display',serif;font-size:16px;color:var(--coffee);margin-bottom:4px;}
+        .cart-item-info .price{font-size:14px;color:var(--text-muted);}
+        .qty-control{display:flex;align-items:center;gap:8px;}
+        .qty-btn{width:32px;height:32px;border-radius:8px;border:1.5px solid var(--cream);background:var(--white);
+            font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;
+            color:var(--coffee);transition:all 0.2s;font-weight:600;}
+        .qty-btn:hover{background:var(--coffee);color:var(--white);border-color:var(--coffee);}
+        .qty-val{font-weight:600;font-size:15px;min-width:20px;text-align:center;}
+        .cart-item-subtotal{font-family:'Playfair Display',serif;font-size:16px;font-weight:700;
+            color:var(--coffee-medium);min-width:100px;text-align:right;}
+        .remove-btn{background:none;border:none;color:#c0392b;cursor:pointer;font-size:18px;
+            padding:4px;transition:transform 0.2s;}
+        .remove-btn:hover{transform:scale(1.2);}
+
+        /* CHECKOUT BOX */
+        .checkout-box{background:var(--white);border-radius:20px;padding:28px;
+            box-shadow:0 2px 8px rgba(75,42,18,0.08);border:1px solid rgba(229,214,195,0.4);
+            position:sticky;top:100px;align-self:start;}
+        .checkout-box h3{font-family:'Playfair Display',serif;font-size:22px;color:var(--coffee);margin-bottom:20px;}
+        .summary-row{display:flex;justify-content:space-between;padding:8px 0;font-size:14px;color:var(--text-muted);}
+        .summary-total{display:flex;justify-content:space-between;padding:14px 0;border-top:2px solid var(--cream);
+            margin-top:8px;font-size:18px;font-weight:700;color:var(--coffee);}
+        .form-group{margin-bottom:16px;}
+        .form-group label{display:block;font-size:13px;font-weight:600;color:var(--coffee);margin-bottom:6px;}
+        .form-input{width:100%;padding:12px 16px;border:1.5px solid var(--cream);border-radius:12px;
+            font-size:14px;outline:none;transition:border-color 0.3s;background:var(--paper);font-family:'Inter',sans-serif;}
+        .form-input:focus{border-color:var(--coffee);}
+        .form-select{width:100%;padding:12px 16px;border:1.5px solid var(--cream);border-radius:12px;
+            font-size:14px;outline:none;background:var(--paper);font-family:'Inter',sans-serif;cursor:pointer;}
+        .form-select:focus{border-color:var(--coffee);}
+
+        /* PAYMENT OPTIONS */
+        .payment-options{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;}
+        .payment-opt{padding:16px;border:2px solid var(--cream);border-radius:14px;text-align:center;
+            cursor:pointer;transition:all 0.3s;background:var(--white);}
+        .payment-opt:hover{border-color:var(--gold);}
+        .payment-opt.selected{border-color:var(--coffee);background:var(--cream-lightest);}
+        .payment-opt input{display:none;}
+        .payment-opt .pay-icon{font-size:28px;margin-bottom:6px;}
+        .payment-opt .pay-label{font-size:13px;font-weight:600;color:var(--coffee);}
+
+        .btn-checkout{width:100%;padding:16px;border:none;border-radius:14px;background:var(--coffee);
+            color:var(--white);font-size:16px;font-weight:600;cursor:pointer;transition:all 0.3s;
+            font-family:'Inter',sans-serif;margin-top:8px;}
+        .btn-checkout:hover{background:var(--coffee-medium);transform:translateY(-2px);
+            box-shadow:0 8px 24px rgba(75,42,18,0.25);}
+        .btn-checkout:disabled{opacity:0.5;cursor:not-allowed;transform:none;box-shadow:none;}
+
+        /* EMPTY CART */
+        .empty-cart{text-align:center;padding:80px 24px;}
+        .empty-cart .icon{font-size:72px;margin-bottom:16px;}
+        .empty-cart h3{font-family:'Playfair Display',serif;font-size:24px;color:var(--coffee);margin-bottom:8px;}
+        .empty-cart p{color:var(--text-muted);margin-bottom:24px;}
+        .btn-browse{display:inline-flex;align-items:center;gap:8px;padding:14px 32px;background:var(--coffee);
+            color:var(--white);border-radius:50px;text-decoration:none;font-weight:600;transition:all 0.3s;}
+        .btn-browse:hover{background:var(--coffee-medium);transform:translateY(-2px);}
+
+        /* FOOTER */
+        .footer{background:var(--coffee-darkest);color:rgba(255,255,255,0.6);padding:72px 0 0;}
+        .footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:48px;margin-bottom:48px;}
+        .footer-brand{font-family:'Great Vibes',cursive;font-size:36px;color:var(--gold);margin-bottom:16px;}
+        .footer-desc{font-size:14px;line-height:1.8;margin-bottom:20px;}
+        .footer-socials{display:flex;gap:12px;}
+        .footer-socials a{width:40px;height:40px;border-radius:10px;background:rgba(255,255,255,0.06);
+            display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.5);
+            text-decoration:none;transition:all 0.3s;font-size:16px;}
+        .footer-socials a:hover{background:var(--gold);color:var(--coffee-darkest);}
+        .footer h4{color:var(--white);font-family:'Playfair Display',serif;font-size:16px;font-weight:600;margin-bottom:20px;}
+        .footer ul{list-style:none;}
+        .footer ul li{margin-bottom:12px;}
+        .footer ul a{color:rgba(255,255,255,0.5);text-decoration:none;font-size:14px;transition:color 0.3s;}
+        .footer ul a:hover{color:var(--gold);}
+        .footer-bottom{border-top:1px solid rgba(255,255,255,0.08);padding:24px 0;text-align:center;font-size:13px;}
+
+        @media(max-width:1024px){.cart-layout{grid-template-columns:1fr;}}
+        @media(max-width:768px){.nav-links{display:none;}
+            .nav-links.active{display:flex;flex-direction:column;position:absolute;top:100%;left:0;right:0;
+                background:rgba(250,248,245,0.98);backdrop-filter:blur(20px);padding:24px;gap:16px;}
+            .nav-toggle{display:block;}
+            .payment-options{grid-template-columns:1fr;}
+            .footer-grid{grid-template-columns:1fr;text-align:center;}
+            .footer-socials{justify-content:center;}}
     </style>
 </head>
 <body>
-    <div class="sidebar" id="sidebar">
-        <div class="toggle-btn" onclick="toggleSidebar()"><i class="bi bi-list"></i></div>
-        <div class="profile">
-            <i class="bi bi-person-circle"></i>
-            <div class="menu-text"><strong>{{ $user->name }}</strong><br><small>Admin</small></div>
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="container">
+            <a href="/" class="nav-brand">felize cafe</a>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="/#about">Tentang</a></li>
+                <li><a href="/menu">Menu</a></li>
+                <li><a href="/cart">🛒 Keranjang</a></li>
+                <li><a href="{{ url('/admin') }}" class="nav-cta">Pesan Meja</a></li>
+            </ul>
+            <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+                <span></span><span></span><span></span>
+            </button>
         </div>
-        <a href="/admin"><i class="bi bi-grid"></i><span class="menu-text">Dashboard</span></a>
-        <a href="/admin/booking"><i class="bi bi-book"></i><span class="menu-text">Booking</span></a>
-        <a href="/admin/calendar"><i class="bi bi-calendar"></i><span class="menu-text">Calendar</span></a>
-        <a href="/admin/seats"><i class="bi bi-person"></i><span class="menu-text">Seats</span></a>
-        <a href="/admin/customers"><i class="bi bi-people"></i><span class="menu-text">Customer list</span></a>
-        <a href="/admin/manual"><i class="bi bi-journal-text"></i><span class="menu-text">Manual</span></a>
+    </nav>
+
+    <section class="page-header">
+        <h1>Keranjang Anda</h1>
+        <p>Periksa pesanan Anda sebelum checkout</p>
+    </section>
+
+    <div class="container">
+        <!-- EMPTY STATE -->
+        <div class="empty-cart" id="emptyCart" style="display:none;">
+            <div class="icon">🛒</div>
+            <h3>Keranjang Kosong</h3>
+            <p>Anda belum menambahkan produk apapun. Yuk jelajahi menu kami!</p>
+            <a href="/menu" class="btn-browse">☕ Jelajahi Menu</a>
+        </div>
+
+        <!-- CART CONTENT -->
+        <div class="cart-layout" id="cartContent" style="display:none;">
+            <div class="cart-items-box">
+                <h3 style="font-family:'Playfair Display',serif;font-size:20px;color:var(--coffee);margin-bottom:16px;">
+                    Item Pesanan
+                </h3>
+                <div id="cartItemsList"></div>
+            </div>
+
+            <div class="checkout-box">
+                <h3>Checkout</h3>
+
+                <div id="summarySection"></div>
+
+                <form method="POST" action="{{ route('checkout') }}" id="checkoutForm">
+                    @csrf
+                    <input type="hidden" name="items" id="cartItemsInput">
+
+                    <div class="form-group">
+                        <label>Nama Lengkap *</label>
+                        <input type="text" name="customer_name" class="form-input" placeholder="Masukkan nama Anda" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Nomor WhatsApp *</label>
+                        <input type="tel" name="customer_phone" class="form-input" placeholder="081234567890" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Pilih Meja (Opsional)</label>
+                        <select name="seat_code" class="form-select">
+                            <option value="">— Tidak pilih meja —</option>
+                            @foreach($seats as $seat)
+                                <option value="{{ $seat->seat_code }}">{{ $seat->seat_code }} — {{ $seat->position }} ({{ $seat->capacity }} orang)</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Catatan (Opsional)</label>
+                        <textarea name="notes" class="form-input" rows="2" placeholder="Tidak pakai gula, dll..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Metode Pembayaran *</label>
+                        <div class="payment-options">
+                            <label class="payment-opt" id="payWa" onclick="selectPayment('whatsapp')">
+                                <input type="radio" name="payment_method" value="whatsapp" required>
+                                <div class="pay-icon">💬</div>
+                                <div class="pay-label">WhatsApp</div>
+                            </label>
+                            <label class="payment-opt" id="payQris" onclick="selectPayment('qris')">
+                                <input type="radio" name="payment_method" value="qris">
+                                <div class="pay-icon">📱</div>
+                                <div class="pay-label">QRIS</div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-checkout" id="btnCheckout" disabled>
+                        🛒 Buat Pesanan
+                    </button>
+                </form>
+            </div>
+        </div>
     </div>
-    <div class="content" id="content">
-        <div class="top-header"><i class="bi bi-journal-text"></i> MANUAL</div>
-        <div class="topic-select">
-            <form method="GET" action="/admin/manual">
-                <select name="topic" class="select-btn" onchange="this.form.submit()">
-                    @foreach($topics as $key => $label)
-                        <option value="{{ $key }}" @if($key===$topic) selected @endif>{{ $label }}</option>
-                    @endforeach
-                </select>
-            </form>
-        </div>
-        <div class="manual-box">
-            <div class="manual-title">MANUAL</div>
-            <div class="manual-sub">HOW TO USE THIS SYSTEM</div>
-            <hr>
-            @if($topic==='dashboard')
-            <div class="manual-section">
-                <p>Welcome to the Dashboard User Manual. This document provides you with essential information to navigate and utilize the dashboard effectively. The dashboard is a powerful tool designed to provide you with insights and control over your business. It displays critical statistics and allows you to manage date and account settings.</p>
-                <h5>Number of Customers</h5>
-                <p>This section shows the current total number of customers using your services. It helps you track your customer base and monitor its growth.</p>
-                <h5>Number of Bookings</h5>
-                <p>Here, you can see the total number of bookings made within a specified time frame. This metric helps you analyze booking trends and assess your business's performance.</p>
-                <h5>Availability Status</h5>
-                <p>The availability status section indicates the current availability of your services. It can include information on whether your services are fully booked, partially booked, or available.</p>
-            </div>
-            @elseif($topic==='booking')
-            <div class="manual-section">
-                <p>The Booking page allows you to create and retrieve customer bookings. Fill in the required fields and save to store the booking. Use the retrieve function to load existing bookings using phone number.</p>
-                <h5>Customer Name</h5>
-                <p>Enter the customer's full name in the specified format.</p>
-                <h5>Phone Number</h5>
-                <p>Provide a valid phone number; it is used for retrieval.</p>
-                <h5>Date & Time</h5>
-                <p>Select the desired date and time for the reservation.</p>
-                <h5>Seats</h5>
-                <p>Specify the number of seats required. Use the bottom menu to navigate to Customer List, Availability, Seats, or Back.</p>
-            </div>
-            @elseif($topic==='calendar')
-            <div class="manual-section">
-                <p>The Calendar provides a monthly overview with booking counts per day. Use the arrows or dropdown to change months, and click a date to view details.</p>
-                <h5>Month and Year</h5>
-                <p>Navigate between months and years to see bookings.</p>
-                <h5>Daily Counts</h5>
-                <p>Each date displays the number of bookings registered.</p>
-            </div>
-            @elseif($topic==='seats')
-            <div class="manual-section">
-                <p>The Seats page shows seat availability per date and time. Toggle the status to mark a seat as Reserved or Available.</p>
-                <h5>Date & Time Filters</h5>
-                <p>Choose the date and time from the controls above to load seats.</p>
-                <h5>Status Toggle</h5>
-                <p>Use the status button to change the seat state. Reserved By will show the booking name if available.</p>
-            </div>
-            @elseif($topic==='customers')
-            <div class="manual-section">
-                <p>The Customer List displays all registered customers. Use search and filters to find entries and review booking history.</p>
-                <h5>Search</h5>
-                <p>Type keywords to filter by name or phone.</p>
-                <h5>Details</h5>
-                <p>Open a customer to view bookings and actions.</p>
-            </div>
-            @elseif($topic==='account')
-            <div class="manual-section">
-                <p>Account Settings lets you update your profile information such as name, position, admin ID, email address, and password.</p>
-                <h5>Save Changes</h5>
-                <p>Click Save to store updates, or Back to return.</p>
-            </div>
-            @endif
-        </div>
-        <div class="text-center" style="margin:14px 0 24px;">
-            <a href="/admin" class="btn btn-coffee"><i class="bi bi-arrow-left"></i> BACK</a>
-        </div>
-    </div>
+
+    @include('partials.footer')
+
     <script>
-        function toggleSidebar(){
-            var sidebar = document.getElementById("sidebar");
-            var content = document.getElementById("content");
-            sidebar.classList.toggle("collapsed");
-            content.classList.toggle("full");
+        function getCart() {
+            try { return JSON.parse(localStorage.getItem('felize_cart') || '[]'); }
+            catch(e) { return []; }
         }
+        function saveCart(cart) { localStorage.setItem('felize_cart', JSON.stringify(cart)); }
+        function fmt(n) { return 'Rp ' + n.toLocaleString('id-ID'); }
+
+        function renderCart() {
+            var cart = getCart();
+            if (cart.length === 0) {
+                document.getElementById('emptyCart').style.display = 'block';
+                document.getElementById('cartContent').style.display = 'none';
+                return;
+            }
+            document.getElementById('emptyCart').style.display = 'none';
+            document.getElementById('cartContent').style.display = 'grid';
+
+            var html = '';
+            var total = 0;
+            cart.forEach(function(item) {
+                var sub = item.price * item.quantity;
+                total += sub;
+                var imgSrc = item.image_url || '';
+                var imgTag = imgSrc
+                    ? '<img class="cart-item-img" src="' + imgSrc + '" alt="' + item.name + '">'
+                    : '<div class="cart-item-img" style="display:flex;align-items:center;justify-content:center;font-size:24px;">☕</div>';
+
+                html += '<div class="cart-item">' +
+                    imgTag +
+                    '<div class="cart-item-info"><h4>' + item.name + '</h4>' +
+                    '<div class="price">' + fmt(item.price) + '</div></div>' +
+                    '<div class="qty-control">' +
+                    '<button class="qty-btn" onclick="changeQty(' + item.product_id + ',-1)">−</button>' +
+                    '<span class="qty-val">' + item.quantity + '</span>' +
+                    '<button class="qty-btn" onclick="changeQty(' + item.product_id + ',1)">+</button></div>' +
+                    '<div class="cart-item-subtotal">' + fmt(sub) + '</div>' +
+                    '<button class="remove-btn" onclick="removeItem(' + item.product_id + ')" title="Hapus">✕</button>' +
+                    '</div>';
+            });
+            document.getElementById('cartItemsList').innerHTML = html;
+
+            var count = cart.reduce(function(s, i) { return s + i.quantity; }, 0);
+            var summary = '<div class="summary-row"><span>' + count + ' item</span><span>' + fmt(total) + '</span></div>' +
+                '<div class="summary-total"><span>Total</span><span>' + fmt(total) + '</span></div>';
+            document.getElementById('summarySection').innerHTML = summary;
+
+            document.getElementById('cartItemsInput').value = JSON.stringify(
+                cart.map(function(i) { return { product_id: i.product_id, quantity: i.quantity }; })
+            );
+        }
+
+        function changeQty(pid, delta) {
+            var cart = getCart();
+            var item = cart.find(function(i) { return i.product_id === pid; });
+            if (!item) return;
+            item.quantity += delta;
+            if (item.quantity <= 0) { cart = cart.filter(function(i) { return i.product_id !== pid; }); }
+            saveCart(cart);
+            renderCart();
+        }
+
+        function removeItem(pid) {
+            var cart = getCart().filter(function(i) { return i.product_id !== pid; });
+            saveCart(cart);
+            renderCart();
+        }
+
+        function selectPayment(method) {
+            document.querySelectorAll('.payment-opt').forEach(function(el) { el.classList.remove('selected'); });
+            if (method === 'whatsapp') { document.getElementById('payWa').classList.add('selected'); }
+            else { document.getElementById('payQris').classList.add('selected'); }
+            document.getElementById('btnCheckout').disabled = false;
+        }
+
+        // Clear cart after form submission
+        document.getElementById('checkoutForm').addEventListener('submit', function() {
+            setTimeout(function() { localStorage.removeItem('felize_cart'); }, 500);
+        });
+
+        document.getElementById('navToggle').addEventListener('click', function() {
+            document.getElementById('navLinks').classList.toggle('active');
+        });
+
+        renderCart();
     </script>
 </body>
 </html>
