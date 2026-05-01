@@ -4,13 +4,13 @@ namespace App\Filament\Pages;
 
 use App\Models\Setting;
 use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 
 class CafeSettings extends Page implements HasForms
 {
@@ -37,7 +37,7 @@ class CafeSettings extends Page implements HasForms
         $this->qris_image = Setting::getValue('qris_image', '');
     }
 
-    public function form(Form $form): Form
+    public function form(Schema $form): Schema
     {
         return $form
             ->schema([
