@@ -19,8 +19,19 @@ Route::get('/api/products', [MenuController::class, 'products'])->name('api.prod
 
 // 3. Cart & Checkout
 Route::get('/cart', [CartController::class, 'index'])->name('cart');
-Route::post('/checkout', [CartController::class, 'checkout'])->name('checkout');
-Route::get('/order/{orderCode}', [CartController::class, 'confirmation'])->name('order.confirmation');
+
+Route::middleware('auth')->group(function () {
+    Route::post('/checkout', [CartController::class, 'checkout'])->name('checkout');
+    Route::get('/order/{orderCode}', [CartController::class, 'confirmation'])->name('order.confirmation');
+});
+
+// 4. Reservation
+use App\Http\Controllers\ReservationController;
+Route::get('/reservation', [ReservationController::class, 'index'])->name('reservation.index');
+Route::middleware('auth')->group(function () {
+    Route::post('/reservation', [ReservationController::class, 'store'])->name('reservation.store');
+});
+Route::get('/api/reservation/slots', [ReservationController::class, 'availableSlots'])->name('api.reservation.slots');
 
 // ======== CAFE MANAGEMENT (FILAMENT) ========
 

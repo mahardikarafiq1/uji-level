@@ -43,20 +43,27 @@ class MenuController extends Controller
      */
     public function products(Request $request)
     {
-        $products = Product::where('is_available', true)
-            ->orderBy('name')
-            ->get()
-            ->map(function ($product) {
-                return [
-                    'id'          => $product->id,
-                    'name'        => $product->name,
-                    'price'       => (float) $product->price,
-                    'description' => $product->description,
-                    'category'    => $product->category,
-                    'image_url'   => $product->image_url,
-                ];
-            });
+        $products = cache()->remember('products_api', 60, function () {
+            return Product::where('is_available', true)
+                ->orderBy('name')
+                ->get();
+        });
 
-        return response()->json($products);
+        $mapped = $products->map(function ($product) {
+            return [
+                'id'                  => $product->id,
+                'name'                => $product->name,
+                'price'               => (float) $product->price,
+                'effective_price'     => (float) $product->effective_price,
+                'description'         => $product->description,
+                'category'            => $product->category,
+                'image_url'           => $product->image_url,
+                'is_flash_sale'       => $product->isOnFlashSale(),
+                'discount_percentage' => $product->isOnFlashSale() ? $product->discount_percentage : 0,
+                'discount_expires_at' => $product->isOnFlashSale() ? $product->discount_expires_at->toIso8601String() : null,
+            ];
+        });
+
+        return response()->json($mapped);
     }
 }

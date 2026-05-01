@@ -133,21 +133,7 @@
     </style>
 </head>
 <body>
-    <!-- NAVBAR -->
-    <nav class="navbar">
-        <div class="container">
-            <a href="/" class="nav-brand">felize cafe</a>
-            <ul class="nav-links" id="navLinks">
-                <li><a href="/#about">Tentang</a></li>
-                <li><a href="/menu">Menu</a></li>
-                <li><a href="/cart">🛒 Keranjang</a></li>
-                <li><a href="{{ url('/admin') }}" class="nav-cta">Pesan Meja</a></li>
-            </ul>
-            <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
-                <span></span><span></span><span></span>
-            </button>
-        </div>
-    </nav>
+    @include('partials.navbar')
 
     <section class="page-header">
         <h1>Keranjang Anda</h1>
@@ -198,6 +184,22 @@
                     </div>
 
                     <div class="form-group">
+                        <label>Tipe Pesanan *</label>
+                        <div class="payment-options">
+                            <label class="payment-opt selected" id="typeDineIn" onclick="selectType('dine_in')">
+                                <input type="radio" name="order_type" value="dine_in" checked required>
+                                <div class="pay-icon">🍽️</div>
+                                <div class="pay-label">Makan di Tempat</div>
+                            </label>
+                            <label class="payment-opt" id="typeTakeAway" onclick="selectType('take_away')">
+                                <input type="radio" name="order_type" value="take_away">
+                                <div class="pay-icon">🛍️</div>
+                                <div class="pay-label">Bawa Pulang</div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group" id="seatGroup">
                         <label>Pilih Meja (Opsional)</label>
                         <select name="seat_code" class="form-select">
                             <option value="">— Tidak pilih meja —</option>
@@ -288,6 +290,13 @@
             document.getElementById('cartItemsInput').value = JSON.stringify(
                 cart.map(function(i) { return { product_id: i.product_id, quantity: i.quantity }; })
             );
+
+            // Update navbar badge
+            var badge = document.getElementById('cartBadgeNav');
+            if (badge) {
+                badge.textContent = count;
+                badge.style.display = count > 0 ? 'flex' : 'none';
+            }
         }
 
         function changeQty(pid, delta) {
@@ -307,10 +316,21 @@
         }
 
         function selectPayment(method) {
-            document.querySelectorAll('.payment-opt').forEach(function(el) { el.classList.remove('selected'); });
+            document.querySelectorAll('#payWa, #payQris').forEach(function(el) { el.classList.remove('selected'); });
             if (method === 'whatsapp') { document.getElementById('payWa').classList.add('selected'); }
             else { document.getElementById('payQris').classList.add('selected'); }
             document.getElementById('btnCheckout').disabled = false;
+        }
+
+        function selectType(type) {
+            document.querySelectorAll('#typeDineIn, #typeTakeAway').forEach(function(el) { el.classList.remove('selected'); });
+            if (type === 'dine_in') { 
+                document.getElementById('typeDineIn').classList.add('selected'); 
+                document.getElementById('seatGroup').style.display = 'block';
+            } else { 
+                document.getElementById('typeTakeAway').classList.add('selected'); 
+                document.getElementById('seatGroup').style.display = 'none';
+            }
         }
 
         // Clear cart after form submission

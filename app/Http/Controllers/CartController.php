@@ -23,6 +23,7 @@ class CartController extends Controller
             'customer_name'  => 'required|string|max:255',
             'customer_phone' => 'required|string|max:20',
             'payment_method' => 'required|in:whatsapp,qris',
+            'order_type'     => 'required|in:dine_in,take_away',
             'seat_code'      => 'nullable|string|max:10',
             'notes'          => 'nullable|string|max:1000',
             'items'          => 'required|string', // JSON string
@@ -34,9 +35,10 @@ class CartController extends Controller
             return back()->with('error', 'Keranjang kosong!');
         }
 
-        // Calculate total and validate products
+        // Calculate total and validate products (with flash sale pricing)
         $totalAmount = 0;
         $orderItems = [];
+        $totalItemsQty = 0;
 
         foreach ($items as $item) {
             $product = Product::find($item['product_id']);
@@ -45,13 +47,15 @@ class CartController extends Controller
             }
 
             $qty = max(1, (int) $item['quantity']);
-            $subtotal = $product->price * $qty;
+            $unitPrice = $product->effective_price; // Uses flash sale price if active
+            $subtotal = $unitPrice * $qty;
             $totalAmount += $subtotal;
+            $totalItemsQty += $qty;
 
             $orderItems[] = [
                 'product_id' => $product->id,
                 'quantity'   => $qty,
-                'unit_price' => $product->price,
+                'unit_price' => $unitPrice,
                 'subtotal'   => $subtotal,
             ];
         }
@@ -60,21 +64,44 @@ class CartController extends Controller
             return back()->with('error', 'Tidak ada produk valid dalam pesanan.');
         }
 
+        // Loyalty Discount: Buy 10 get 1 free (cheapest item free)
+        $user = auth()->user();
+        $loyaltyDiscount = 0;
+        $freeItemName = null;
+
+        if ($user && $totalItemsQty >= 10) {
+            // Find cheapest item to give free
+            $cheapest = collect($orderItems)->sortBy('unit_price')->first();
+            $loyaltyDiscount = $cheapest['unit_price'];
+            $totalAmount -= $loyaltyDiscount;
+            $freeItemName = Product::find($cheapest['product_id'])?->name;
+        }
+
+        // Ensure total is not negative
+        $totalAmount = max(0, $totalAmount);
+
         // Create order
         $order = Order::create([
             'order_code'     => Order::generateOrderCode(),
+            'user_id'        => auth()->id(),
             'customer_name'  => $validated['customer_name'],
             'customer_phone' => $validated['customer_phone'],
             'total_amount'   => $totalAmount,
             'status'         => 'pending',
+            'order_type'     => $validated['order_type'],
             'payment_method' => $validated['payment_method'],
-            'seat_code'      => $validated['seat_code'] ?? null,
+            'seat_code'      => $validated['order_type'] === 'dine_in' ? ($validated['seat_code'] ?? null) : null,
             'notes'          => $validated['notes'] ?? null,
         ]);
 
         // Create order items
         foreach ($orderItems as $oi) {
             $order->items()->create($oi);
+        }
+
+        // Update user loyalty points
+        if ($user) {
+            $user->increment('loyalty_points', $totalItemsQty);
         }
 
         // Reload with items

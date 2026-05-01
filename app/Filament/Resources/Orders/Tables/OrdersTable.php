@@ -36,6 +36,20 @@ class OrdersTable
                     ->placeholder('—')
                     ->toggleable(isToggledHiddenByDefault: true),
 
+                TextColumn::make('order_type')
+                    ->label('Tipe')
+                    ->badge()
+                    ->color(fn (?string $state): string => match ($state) {
+                        'dine_in'   => 'success',
+                        'take_away' => 'warning',
+                        default     => 'gray',
+                    })
+                    ->formatStateUsing(fn (?string $state): string => match ($state) {
+                        'dine_in'   => '🍽️ Dine In',
+                        'take_away' => '🛍️ Take Away',
+                        default     => '—',
+                    }),
+
                 TextColumn::make('seat_code')
                     ->label('Meja')
                     ->badge()
@@ -95,6 +109,12 @@ class OrdersTable
                     ->options([
                         'whatsapp' => 'WhatsApp',
                         'qris'     => 'QRIS',
+                    ]),
+                SelectFilter::make('order_type')
+                    ->label('Tipe Pesanan')
+                    ->options([
+                        'dine_in'   => 'Dine In',
+                        'take_away' => 'Take Away',
                     ]),
             ])
             ->recordActions([

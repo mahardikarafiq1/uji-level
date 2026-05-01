@@ -259,22 +259,7 @@
 </head>
 <body>
 
-    <!-- ===== NAVBAR ===== -->
-    <nav class="navbar" id="navbar">
-        <div class="container">
-            <a href="/" class="nav-brand">felize cafe</a>
-            <ul class="nav-links" id="navLinks">
-                <li><a href="#about">Tentang Kami</a></li>
-                <li><a href="#menu">Sajian Menu</a></li>
-                <li><a href="#features">Kenapa Kami</a></li>
-                <li><a href="/cart" class="nav-cart-link">🛒 <span class="cart-badge" id="cartBadge">0</span></a></li>
-                <li><a href="{{ url('/admin') }}" class="nav-cta">Pesan Meja</a></li>
-            </ul>
-            <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
-                <span></span><span></span><span></span>
-            </button>
-        </div>
-    </nav>
+    @include('partials.navbar')
 
     <!-- ===== HERO ===== -->
     <section class="hero" id="hero">
@@ -345,11 +330,18 @@
             
             <div class="menu-grid">
                 @php
-                    $highlightProducts = \App\Models\Product::where('is_available', true)->take(6)->get();
+                    $highlightProducts = cache()->remember('highlight_products', 60, function () {
+                        return \App\Models\Product::where('is_available', true)->take(6)->get();
+                    });
                 @endphp
 
                 @forelse($highlightProducts as $delay => $product)
-                <div class="menu-card reveal stagger-{{ min($delay + 1, 6) }}">
+                <div class="menu-card reveal stagger-{{ min($delay + 1, 6) }}" style="position:relative;">
+                    @if($product->isOnFlashSale())
+                        <div style="position:absolute;top:12px;left:12px;z-index:5;background:linear-gradient(135deg,#e74c3c,#c0392b);color:#fff;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:0.5px;animation:pulse 1.5s infinite;">
+                            🔥 -{{ $product->discount_percentage }}% FLASH SALE
+                        </div>
+                    @endif
                     <a href="{{ url('/menu/' . $product->id) }}" style="text-decoration:none; color:inherit; display:block;">
                         <div class="menu-card-img-wrap">
                             @if($product->image_url)
@@ -364,7 +356,14 @@
                             <h3>{{ $product->name }}</h3>
                         </a>
                         <p>{{ Str::limit($product->description, 60) }}</p>
-                        <div class="menu-card-price">Rp {{ number_format($product->price, 0, ',', '.') }}</div>
+                        @if($product->isOnFlashSale())
+                            <div class="menu-card-price">
+                                <span style="text-decoration:line-through;color:var(--text-muted);font-size:14px;margin-right:6px;">Rp {{ number_format($product->price, 0, ',', '.') }}</span>
+                                <span style="color:#e74c3c;font-weight:700;">Rp {{ number_format($product->effective_price, 0, ',', '.') }}</span>
+                            </div>
+                        @else
+                            <div class="menu-card-price">Rp {{ number_format($product->price, 0, ',', '.') }}</div>
+                        @endif
                     </div>
                 </div>
                 @empty
@@ -458,7 +457,7 @@
             try { 
                 var cart = JSON.parse(localStorage.getItem('felize_cart') || '[]');
                 var count = cart.reduce((sum, item) => sum + item.quantity, 0);
-                var badge = document.getElementById('cartBadge');
+                var badge = document.getElementById('cartBadgeNav');
                 if (badge) {
                     badge.textContent = count;
                     badge.style.display = count > 0 ? 'flex' : 'none';

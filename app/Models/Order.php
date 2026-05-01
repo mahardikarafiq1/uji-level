@@ -15,6 +15,7 @@ class Order extends Model
         'customer_phone',
         'total_amount',
         'status',
+        'order_type',
         'payment_method',
         'seat_code',
         'notes',
