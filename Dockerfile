@@ -17,6 +17,7 @@ RUN apk add --no-cache \
 # Install PHP extensions
 RUN docker-php-ext-install \
     pdo_mysql \
+    pdo_pgsql \
     mbstring \
     exif \
     pcntl \
@@ -54,6 +55,7 @@ RUN apk add --no-cache nginx libpng libzip icu-libs oniguruma libxml2
 # Install PHP extensions needed at runtime
 RUN docker-php-ext-install \
     pdo_mysql \
+    pdo_pgsql \
     mbstring \
     exif \
     pcntl \
